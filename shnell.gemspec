@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
      "README.rdoc"
   ]
   s.files = [
-    "bin/shnell",
+    "VERSION",
+     "bin/shnell",
      "lib/backup.rb",
      "lib/shnell.rb"
   ]
