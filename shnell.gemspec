@@ -19,13 +19,13 @@ Gem::Specification.new do |s|
      "README.rdoc"
   ]
   s.files = [
-    ".document",
-     ".gitignore",
+    ".gitignore",
      "LICENSE",
      "README.rdoc",
      "Rakefile",
      "bin/shnell",
-     "lib/shnell.rb"
+     "lib/shnell.rb",
+     "shnell.gemspec"
   ]
   s.homepage = %q{http://github.com/jo/shnell}
   s.rdoc_options = ["--charset=UTF-8"]

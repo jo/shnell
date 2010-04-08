@@ -11,7 +11,7 @@ program :help, 'Author', 'Johannes Jörg Schmidt, TF <schmidt@netzmerk.com>'
 
 default_command :help
 
-SCRIPTS_ROOT = Pathname.new(File.expand_path('../../scripts', __FILE__))
+SCRIPTS_ROOT = Pathname.new(Dir.pwd)
 
 command :list do |c|
   c.syntax = 'shnell list [pattern]'
