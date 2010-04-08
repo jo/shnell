@@ -1,12 +1,10 @@
 require 'rubygems'
 require 'rake'
-require File.join(File.dirname(__FILE__), 'lib', 'shnell')
 
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "shnell"
-    gem.version = Shnell::VERSION
     gem.summary = %Q{Server Setup and Configuration tools}
     gem.description = %Q{Ease Server Setup and Configuration}
     gem.email = "schmidt@netzmerk.com"
