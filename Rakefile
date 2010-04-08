@@ -13,7 +13,7 @@ begin
     gem.homepage = "http://github.com/jo/shnell"
     gem.authors = ["Johannes J. Schmidt"]
     gem.add_dependency "commander", ">= 4.0.2"
-    gem.add_dependency "filander", ">= 0.4.0"
+    gem.add_dependency "filander", ">= 0.4.1"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
