@@ -131,6 +131,8 @@ command :backup do |c|
     require File.join(File.dirname(__FILE__), '../lib/backup')
     include Backup
 
+    Filander.quiet = options.quiet
+
     if script == "all"
       pattern = args.shift
 
