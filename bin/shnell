@@ -2,7 +2,8 @@
 
 require 'rubygems'
 require 'commander/import'
-require File.join(File.dirname(__FILE__), '../lib', 'shnell')
+require 'filander'
+require File.join(File.dirname(__FILE__), '../lib/shnell')
 
 program :name, 'shnell'
 program :version, Shnell::VERSION
@@ -11,24 +12,66 @@ program :help, 'Author', 'Johannes Jörg Schmidt, TF <schmidt@netzmerk.com>'
 
 default_command :help
 
-SCRIPTS_ROOT = Pathname.new(Dir.pwd)
+SCRIPTS_ROOT    = Pathname.new(Dir.pwd)
+CONFIG_FILENAME = File.join(SCRIPTS_ROOT, "config.yml")
+
+def scripts(pattern = nil)
+  if pattern
+    exp = "**/*#{pattern}*.rb"
+  else
+    exp = '**/*.rb'
+  end
+  Dir[SCRIPTS_ROOT.join(exp)].select { |f| File.basename(f) != 'backup.rb' }.sort
+end
+
+def backup_scripts(pattern = nil)
+  if pattern
+    exp = "**/*#{pattern}*/backup.rb"
+  else
+    exp = '**/backup.rb'
+  end
+  Dir[SCRIPTS_ROOT.join(exp)].sort
+end
+
+def say_script(filename, message, quiet = false)
+  return if quiet
+  name = Pathname.new(filename).relative_path_from(SCRIPTS_ROOT)
+  message = "#{message} #{name.sub(/\.rb$/, '')}..."
+  message = $terminal.color(message, :bold) if defined? $terminal
+  say message
+end
 
 command :list do |c|
-  c.syntax = 'shnell list [pattern]'
-  c.description = 'List available scripts.'
+  c.syntax = 'shnell list [scrips|backups] [pattern]'
+  c.description = 'List available scripts and backups.'
+
+  c.example "List all available scripts and backups", "shnell list"
+  c.example "List all available backups", "shnell list backups"
+  c.example "List all available scripts", "shnell list scripts"
+  c.example 'List available scripts which include "ruby"', "shnell list scripts ruby"
 
   c.action do |args, options|
+    name = args.shift
     pattern = args.shift
-
-    if pattern
-      exp = "**/*#{pattern}*.rb"
+    if name == "scripts"
+      scripts(pattern).each do |f|
+        path = Pathname.new(f)
+        name = path.relative_path_from(SCRIPTS_ROOT)
+        puts name.sub(/\.rb$/, '')
+      end
+    elsif name == "backups"
+      backup_scripts(pattern).each do |f|
+        path = Pathname.new(f)
+        name = path.relative_path_from(SCRIPTS_ROOT)
+        puts name.sub(/\.rb$/, '')
+      end
     else
-      exp = '**/*.rb'
-    end
-    Dir[SCRIPTS_ROOT.join(exp)].sort.each do |f|
-      path = Pathname.new(f)
-      name = path.relative_path_from(SCRIPTS_ROOT)
-      puts name.sub(/\.rb$/, '')
+      all = scripts(pattern) + backup_scripts(pattern)
+      all.sort.each do |f|
+        path = Pathname.new(f)
+        name = path.relative_path_from(SCRIPTS_ROOT)
+        puts name.sub(/\.rb$/, '')
+      end
     end
   end
 end
@@ -42,12 +85,17 @@ command :run do |c|
   c.option '-q', '--quiet', 'Supress status output'
   c.option '-s', '--skip', 'Skip files that already exist'
 
+  c.example 'Run script "./basic/apache.rb"', "shnell run basic/apache"
+  c.example "Run all available scripts", "shnell run all"
+  c.example 'Run available scripts which include "ruby"', "shnell run all ruby"
+  c.example "Dry run all available scripts (make no changes)", "shnell run all --pretend"
+
   c.action do |args, options|
     $:.unshift SCRIPTS_ROOT
     script = args.shift
-    require 'filander'
     include Filander
 
+    Filander.quiet = options.quiet
     behavior = :ask
     behavior = :skip if options.skip
     behavior = :pretend if options.pretend
@@ -55,17 +103,46 @@ command :run do |c|
     Filander.behavior = behavior
 
     if script == "all"
-      Dir[File.join(SCRIPTS_ROOT, '**/*.rb')].sort.each do |file|
-        name = Pathname.new(file).relative_path_from(SCRIPTS_ROOT)
-        message = "Running #{name.sub(/\.rb$/, '')}..."
-        message = $terminal.color(message, :bold) if defined? $terminal
-        say message
+      pattern = args.shift
+
+      scripts(pattern).each do |file|
+        say_script file, "Running", options.quiet
         Filander.source_root = file.sub(/\.rb$/, '')
         require file
       end
-    else
+    elsif script
       Filander.source_root = File.join(SCRIPTS_ROOT, script)
       require script
+    else
+      say "No script set."
     end
   end
 end
+
+command :backup do |c|
+  c.syntax = 'shnell backup script'
+  c.description = 'Run a backup script.'
+
+  c.option '-q', '--quiet', 'Supress status output'
+
+  c.action do |args, options|
+    script = args.shift
+
+    require File.join(File.dirname(__FILE__), '../lib/backup')
+    include Backup
+
+    if script == "all"
+      pattern = args.shift
+
+      backup_scripts(pattern).each do |file|
+        say_script file, "Backup", options.quiet
+        require file
+      end
+    elsif script
+      require script
+    else
+      say "No backup script set."
+    end
+  end
+end
+

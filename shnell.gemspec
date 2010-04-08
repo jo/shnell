@@ -19,13 +19,9 @@ Gem::Specification.new do |s|
      "README.rdoc"
   ]
   s.files = [
-    ".gitignore",
-     "LICENSE",
-     "README.rdoc",
-     "Rakefile",
-     "bin/shnell",
-     "lib/shnell.rb",
-     "shnell.gemspec"
+    "bin/shnell",
+     "lib/backup.rb",
+     "lib/shnell.rb"
   ]
   s.homepage = %q{http://github.com/jo/shnell}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -39,14 +35,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<commander>, [">= 4.0.2"])
-      s.add_runtime_dependency(%q<filander>, [">= 0.4.2"])
+      s.add_runtime_dependency(%q<filander>, [">= 0.5.0"])
     else
       s.add_dependency(%q<commander>, [">= 4.0.2"])
-      s.add_dependency(%q<filander>, [">= 0.4.2"])
+      s.add_dependency(%q<filander>, [">= 0.5.0"])
     end
   else
     s.add_dependency(%q<commander>, [">= 4.0.2"])
-    s.add_dependency(%q<filander>, [">= 0.4.2"])
+    s.add_dependency(%q<filander>, [">= 0.5.0"])
   end
 end
 

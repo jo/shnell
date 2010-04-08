@@ -14,6 +14,7 @@ begin
     gem.authors = ["Johannes J. Schmidt"]
     gem.add_dependency "commander", ">= 4.0.2"
     gem.add_dependency "filander", ">= 0.5.0"
+    gem.files = "{bin,lib}/**/*"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
