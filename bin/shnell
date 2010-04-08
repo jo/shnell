@@ -25,7 +25,7 @@ command :list do |c|
     else
       exp = '**/*.rb'
     end
-    Dir[SCRIPTS_ROOT.join(exp)].each do |f|
+    Dir[SCRIPTS_ROOT.join(exp)].sort.each do |f|
       path = Pathname.new(f)
       name = path.relative_path_from(SCRIPTS_ROOT)
       puts name.sub(/\.rb$/, '')
