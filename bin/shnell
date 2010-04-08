@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'commander/import'
+require File.join(File.dirname(__FILE__), '../lib', 'shnell')
+
+program :name, 'shnell'
+program :version, Shnell::VERSION
+program :description, 'Server Setup and Configuration'
+program :help, 'Author', 'Johannes Jörg Schmidt, TF <schmidt@netzmerk.com>'
+
+default_command :help
+
+SCRIPTS_ROOT = Pathname.new(File.expand_path('../../scripts', __FILE__))
+
+command :list do |c|
+  c.syntax = 'shnell list [pattern]'
+  c.description = 'List available scripts.'
+
+  c.action do |args, options|
+    pattern = args.shift
+
+    if pattern
+      exp = "**/*#{pattern}*.rb"
+    else
+      exp = '**/*.rb'
+    end
+    Dir[SCRIPTS_ROOT.join(exp)].each do |f|
+      path = Pathname.new(f)
+      name = path.relative_path_from(SCRIPTS_ROOT)
+      puts name.sub(/\.rb$/, '')
+    end
+  end
+end
+
+command :run do |c|
+  c.syntax = 'shnell run script'
+  c.description = 'Run a script.'
+
+  c.option '-f', '--force', 'Overwrite files that already exist'
+  c.option '-p', '--pretend', 'Run but do not make any changes'
+  c.option '-q', '--quiet', 'Supress status output'
+  c.option '-s', '--skip', 'Skip files that already exist'
+
+  c.action do |args, options|
+    $:.unshift SCRIPTS_ROOT
+    script = args.shift
+    require 'filander'
+    include Filander
+
+    behavior = :ask
+    behavior = :skip if options.skip
+    behavior = :pretend if options.pretend
+    behavior = :force if options.force
+    Filander.behavior = behavior
+
+    if script == "all"
+      Dir[File.join(SCRIPTS_ROOT, '**/*.rb')].sort.each do |file|
+        name = Pathname.new(file).relative_path_from(SCRIPTS_ROOT)
+        message = "Running #{name.sub(/\.rb$/, '')}..."
+        message = $terminal.color(message, :bold) if defined? $terminal
+        say message
+        Filander.source_root = file.sub(/\.rb$/, '')
+        require file
+      end
+    else
+      Filander.source_root = File.join(SCRIPTS_ROOT, script)
+      require script
+    end
+  end
+end

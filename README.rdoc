@@ -1,6 +1,6 @@
 = shnell
 
-Description goes here.
+Server Setup and Configuration
 
 == Note on Patches/Pull Requests
  
