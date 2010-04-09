@@ -4,6 +4,10 @@ require 'yaml'
 module Backup
   include Filander
 
+  class << self
+    attr_accessor :behavior
+  end
+
   class BackupScript
     class << self
       def backup(name, &block)
