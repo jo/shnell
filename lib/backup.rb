@@ -62,9 +62,11 @@ module Backup
     end
 
     def restore!
-      Net::FTP.open(ftp_host) do |ftp|
-        ftp.login ftp_user, ftp_password
-        ftp.getbinaryfile @tarball
+      inside "/tmp" do
+        Net::FTP.open(ftp_host) do |ftp|
+          ftp.login ftp_user, ftp_password
+          ftp.getbinaryfile File.basename(@tarball)
+        end
       end
       backup_cmd "tar -C /tmp -xf #{@tarball}"
       @databases.each do |database|
