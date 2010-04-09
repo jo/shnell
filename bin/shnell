@@ -2,9 +2,9 @@
 
 require 'rubygems'
 require 'commander/import'
-require 'filander'
-require File.join(File.dirname(__FILE__), '../lib/shnell')
-require File.join(File.dirname(__FILE__), '../lib/backup')
+
+$:.unshift File.expand_path('../../lib', __FILE__)
+require 'shnell'
 
 program :name, 'shnell'
 program :version, File.read(File.join(File.dirname(__FILE__), '../VERSION'))
@@ -16,8 +16,7 @@ default_command :help
 SCRIPTS_ROOT    = Pathname.new(Dir.pwd)
 CONFIG_FILENAME = File.join(SCRIPTS_ROOT, "config.yml")
 
-include Filander
-include Backup
+include Shnell
 
 def scripts(pattern = nil)
   if pattern
@@ -102,19 +101,19 @@ command :run do |c|
     behavior = :skip if options.skip
     behavior = :pretend if options.pretend
     behavior = :force if options.force
-    Filander.behavior = behavior
-    Filander.quiet = options.quiet
+    Shnell.behavior = behavior
+    Shnell.quiet = options.quiet
 
     if script == "all"
       pattern = args.shift
 
       scripts(pattern).each do |file|
         say_script file, "Running", options.quiet
-        Filander.source_root = file.sub(/\.rb$/, '')
+        Shnell.source_root = file.sub(/\.rb$/, '')
         require file
       end
     elsif script
-      Filander.source_root = File.join(SCRIPTS_ROOT, script)
+      Shnell.source_root = File.join(SCRIPTS_ROOT, script)
       require script
     else
       say "No script set."
@@ -131,8 +130,8 @@ command :backup do |c|
   c.action do |args, options|
     script = args.shift
 
-    Filander.quiet = options.quiet
-    Backup.behavior = :backup
+    Shnell.quiet = options.quiet
+    Shnell.behavior = :backup
 
     if script == "all"
       pattern = args.shift
@@ -142,7 +141,34 @@ command :backup do |c|
         require file
       end
     elsif script
-      require script
+      require File.join(script, 'backup.rb')
+    else
+      say "No backup script set."
+    end
+  end
+end
+
+command :restore do |c|
+  c.syntax = 'shnell restore script'
+  c.description = 'Restore a backup.'
+
+  c.option '-q', '--quiet', 'Supress status output'
+
+  c.action do |args, options|
+    script = args.shift
+
+    Shnell.quiet = options.quiet
+    Shnell.behavior = :restore
+
+    if script == "all"
+      pattern = args.shift
+
+      backup_scripts(pattern).each do |file|
+        say_script file, "Restore", options.quiet
+        require file
+      end
+    elsif script
+      require File.join(script, 'backup.rb')
     else
       say "No backup script set."
     end
