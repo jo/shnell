@@ -4,6 +4,7 @@ require 'rubygems'
 require 'commander/import'
 require 'filander'
 require File.join(File.dirname(__FILE__), '../lib/shnell')
+require File.join(File.dirname(__FILE__), '../lib/backup')
 
 program :name, 'shnell'
 program :version, File.read(File.join(File.dirname(__FILE__), '../VERSION'))
@@ -14,6 +15,9 @@ default_command :help
 
 SCRIPTS_ROOT    = Pathname.new(Dir.pwd)
 CONFIG_FILENAME = File.join(SCRIPTS_ROOT, "config.yml")
+
+include Filander
+include Backup
 
 def scripts(pattern = nil)
   if pattern
@@ -93,14 +97,13 @@ command :run do |c|
   c.action do |args, options|
     $:.unshift SCRIPTS_ROOT
     script = args.shift
-    include Filander
 
-    Filander.quiet = options.quiet
     behavior = :ask
     behavior = :skip if options.skip
     behavior = :pretend if options.pretend
     behavior = :force if options.force
     Filander.behavior = behavior
+    Filander.quiet = options.quiet
 
     if script == "all"
       pattern = args.shift
@@ -127,9 +130,6 @@ command :backup do |c|
 
   c.action do |args, options|
     script = args.shift
-
-    require File.join(File.dirname(__FILE__), '../lib/backup')
-    include Backup
 
     Filander.quiet = options.quiet
 
