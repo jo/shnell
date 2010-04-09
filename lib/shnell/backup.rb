@@ -50,8 +50,10 @@ module Shnell
       def backup!
         @directories.each do |filename|
           report :directory, filename
-          filename = File.join(@service_root, filename)
-          backup_cmd "cp -r #{filename} #{@tempdir}/"
+          file = File.join(@service_root, filename)
+          dirname = File.join(@tempdir, File.dirname(filename))
+          backup_cmd "mkdir -p #{dirname}" unless File.exists?(dirname)
+          backup_cmd "cp -r #{file} #{dirname}/"
         end
         @databases.each do |database|
           report :database, database
