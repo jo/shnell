@@ -132,6 +132,7 @@ command :backup do |c|
     script = args.shift
 
     Filander.quiet = options.quiet
+    Backup.behavior = :backup
 
     if script == "all"
       pattern = args.shift

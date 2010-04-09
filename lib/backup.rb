@@ -141,6 +141,14 @@ module Backup
     end
   end
 
+  def service(filename, &block)
+    if Backup.behavior == :restore
+      restore filename, &block
+    else
+      backup filename, &block
+    end
+  end
+
   def backup(filename, &block)
     BackupScript.backup filename, &block
   end
