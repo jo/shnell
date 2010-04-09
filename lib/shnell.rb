@@ -1,12 +1,14 @@
 require 'filander'
 require 'shnell/config'
 require 'shnell/actions/ftp'
+require 'shnell/actions/database'
 require 'shnell/backup'
 
 module Shnell
   include Config
   include Filander
   include Ftp
+  include Database
   include Backup
 
   class << self

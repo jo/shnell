@@ -10,6 +10,10 @@ module Shnell
       read_config(:db, :password)
     end
 
+    def db_credentials
+      "-u#{db_user} #{"-p#{db_password}" if db_password != ''}"
+    end
+
     def ftp_host
       read_config(:ftp, :host)
     end

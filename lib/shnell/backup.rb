@@ -55,7 +55,7 @@ module Shnell
         end
         @databases.each do |database|
           report :database, database
-          backup_cmd "mysqldump -u#{db_user} #{"-p#{db_password}" if db_password != ''} #{database} > #{File.join(@tempdir, "#{database}.sql")}"
+          backup_cmd "mysqldump #{db_credentials} #{database} > #{File.join(@tempdir, "#{database}.sql")}"
         end
         backup_cmd "tar -C /tmp -cjf #{@tarball} #{@service_name}"
         ftp_put @tarball
