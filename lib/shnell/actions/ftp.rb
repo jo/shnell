@@ -1,6 +1,6 @@
 require 'net/ftp'
 
-module Shnell
+module Shnell::Actions
   module Ftp
     include Config
     include Filander::Base

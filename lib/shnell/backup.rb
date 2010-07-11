@@ -6,7 +6,7 @@ module Shnell
 
     class BackupScript
       include Config
-      include Ftp
+      include Actions::Ftp
 
       class << self
         def backup(name, &block)

@@ -1,4 +1,4 @@
-module Shnell
+module Shnell::Actions
   module Database
     include Config
     include Filander::Base

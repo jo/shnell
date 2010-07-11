@@ -2,13 +2,17 @@ require 'filander'
 require 'shnell/config'
 require 'shnell/actions/ftp'
 require 'shnell/actions/database'
+require 'shnell/actions/gem_install'
+require 'shnell/actions/git_clone'
 require 'shnell/backup'
 
 module Shnell
   include Config
   include Filander
-  include Ftp
-  include Database
+  include Actions::Ftp
+  include Actions::Database
+  include Actions::GemInstall
+  include Actions::GitClone
   include Backup
 
   class << self
